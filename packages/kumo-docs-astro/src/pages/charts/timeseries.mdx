@@ -13,6 +13,7 @@ import {
   CustomAxisLabelFormatDemo,
   GradientLineChartDemo,
   IncompleteDataChartDemo,
+  LegendHighlightDemo,
   LoadingChartDemo,
   TimeRangeSelectionChartDemo,
   TooltipFollowCursorDemo,
@@ -138,6 +139,22 @@ import {
 
   <ComponentExample demo="BarChartDemo">
     <BarChartDemo client:visible />
+  </ComponentExample>
+</ComponentSection>
+
+<ComponentSection>
+
+## Legend Highlight
+
+<p>
+  Hovering a legend item highlights the corresponding series on the chart and
+  fades the others. Use <code>onPointerEnter</code> and{" "}
+  <code>onPointerLeave</code> on <code>ChartLegend</code> items together with{" "}
+  <code>dispatchAction</code> on the chart ref.
+</p>
+
+  <ComponentExample demo="LegendHighlightDemo">
+    <LegendHighlightDemo client:visible />
   </ComponentExample>
 </ComponentSection>
 

@@ -1,7 +1,7 @@
 import type * as echarts from "echarts/core";
 import type { LineSeriesOption, BarSeriesOption } from "echarts/charts";
 import type { EChartsOption, SeriesOption, SetOptionOpts } from "echarts";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
 import { Chart, ChartEvents, KumoChartOption } from "./EChart";
 
@@ -179,33 +179,51 @@ interface TooltipState {
  * />
  * ```
  */
-export function TimeseriesChart({
-  echarts,
-  type = "line",
-  data,
-  xAxisName,
-  xAxisTickCount,
-  xAxisTickFormat,
-  yAxisTickFormat,
-  yAxisTickLabelFormat,
-  yAxisName,
-  yAxisTickCount,
-  tooltipValueFormat,
-  onTimeRangeChange,
-  height = 350,
-  incomplete,
-  isDarkMode,
-  gradient,
-  loading,
-  ariaDescription,
-  optionUpdateBehavior,
-  tooltipMode = "all",
-  tooltipMaxItems = 10,
-  tooltipFollowCursor = "both",
-  tooltipBoundary,
-}: TimeseriesChartProps) {
+export const TimeseriesChart = forwardRef<
+  echarts.ECharts | null,
+  TimeseriesChartProps
+>(function TimeseriesChart(
+  {
+    echarts,
+    type = "line",
+    data,
+    xAxisName,
+    xAxisTickCount,
+    xAxisTickFormat,
+    yAxisTickFormat,
+    yAxisTickLabelFormat,
+    yAxisName,
+    yAxisTickCount,
+    tooltipValueFormat,
+    onTimeRangeChange,
+    height = 350,
+    incomplete,
+    isDarkMode,
+    gradient,
+    loading,
+    ariaDescription,
+    optionUpdateBehavior,
+    tooltipMode = "all",
+    tooltipMaxItems = 10,
+    tooltipFollowCursor = "both",
+    tooltipBoundary,
+  },
+  ref,
+) {
   const chartRef = useRef<echarts.ECharts | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const mergedRef = useCallback(
+    (instance: echarts.ECharts | null) => {
+      chartRef.current = instance;
+      if (typeof ref === "function") {
+        ref(instance);
+      } else if (ref) {
+        ref.current = instance;
+      }
+    },
+    [ref],
+  );
 
   // Keep latest props accessible inside event handlers without stale closures
   const dataRef = useRef(data);
@@ -492,7 +510,7 @@ export function TimeseriesChart({
         {!loading && (
           <Chart
             echarts={echarts}
-            ref={chartRef}
+            ref={mergedRef}
             options={options as EChartsOption}
             height={height}
             isDarkMode={isDarkMode}
@@ -522,7 +540,9 @@ export function TimeseriesChart({
       )}
     </TooltipPrimitive.Root>
   );
-}
+});
+
+TimeseriesChart.displayName = "TimeseriesChart";
 
 // ─── Tooltip content ──────────────────────────────────────────────────────────
 //
